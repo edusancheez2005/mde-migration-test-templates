@@ -1,0 +1,73 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "title": "Machine Response Actions",
+    "description": "Multiple machine actions - unisolate, AV scan, offboard"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Logic/workflows",
+      "apiVersion": "2019-05-01",
+      "name": "Machine-Actions",
+      "properties": {
+        "definition": {
+          "actions": {
+            "Unisolate_Machine": {
+              "type": "Http",
+              "inputs": {
+                "method": "POST",
+                "uri": "https://api.securitycenter.microsoft.com/api/machines/@{triggerBody()?['MachineId']}/unisolate",
+                "body": {
+                  "Comment": "Releasing isolation"
+                }
+              }
+            },
+            "Run_AV_Scan": {
+              "type": "Http",
+              "inputs": {
+                "method": "POST",
+                "uri": "https://api.securitycenter.microsoft.com/api/machines/@{triggerBody()?['MachineId']}/runAntiVirusScan",
+                "body": {
+                  "Comment": "Running full scan",
+                  "ScanType": "Full"
+                }
+              }
+            },
+            "Offboard_Machine": {
+              "type": "Http",
+              "inputs": {
+                "method": "POST",
+                "uri": "https://api.securitycenter.microsoft.com/api/machines/@{triggerBody()?['MachineId']}/offboard",
+                "body": {
+                  "Comment": "Offboarding device"
+                }
+              }
+            },
+            "Get_Vulnerabilities": {
+              "type": "Http",
+              "inputs": {
+                "method": "GET",
+                "uri": "https://api.securitycenter.microsoft.com/api/machines/@{triggerBody()?['MachineId']}/vulnerabilities"
+              }
+            },
+            "Get_All_Vulnerabilities": {
+              "type": "Http",
+              "inputs": {
+                "method": "GET",
+                "uri": "https://api.securitycenter.microsoft.com/api/vulnerabilities"
+              }
+            },
+            "Get_Exposure_Score": {
+              "type": "Http",
+              "inputs": {
+                "method": "GET",
+                "uri": "https://api.securitycenter.microsoft.com/api/exposureScore"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
