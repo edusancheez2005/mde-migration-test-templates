@@ -1,0 +1,74 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "title": "Isolate Machine - MDE",
+    "description": "Isolates a compromised machine using Microsoft Defender for Endpoint API",
+    "prerequisites": [
+      "MDE API access"
+    ],
+    "lastUpdateTime": "2024-05-15T00:00:00.000Z"
+  },
+  "parameters": {
+    "PlaybookName": {
+      "type": "string",
+      "defaultValue": "Isolate-Machine-MDE"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Logic/workflows",
+      "apiVersion": "2019-05-01",
+      "name": "[parameters('PlaybookName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "definition": {
+          "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+          "triggers": {
+            "Microsoft_Sentinel_incident": {
+              "type": "ApiConnectionWebhook",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                  }
+                }
+              }
+            }
+          },
+          "actions": {
+            "Get_Machine_ID": {
+              "type": "Http",
+              "inputs": {
+                "method": "GET",
+                "uri": "https://api.securitycenter.microsoft.com/api/machines/@{triggerBody()?['MachineId']}",
+                "headers": {
+                  "Authorization": "Bearer @{body('Get_Token')?['access_token']}"
+                }
+              }
+            },
+            "Isolate_Machine": {
+              "type": "Http",
+              "inputs": {
+                "method": "POST",
+                "uri": "https://api.securitycenter.microsoft.com/api/machines/@{triggerBody()?['MachineId']}/isolate",
+                "headers": {
+                  "Authorization": "Bearer @{body('Get_Token')?['access_token']}"
+                },
+                "body": {
+                  "Comment": "Isolated by Sentinel playbook",
+                  "IsolationType": "Full"
+                }
+              },
+              "runAfter": {
+                "Get_Machine_ID": [
+                  "Succeeded"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
