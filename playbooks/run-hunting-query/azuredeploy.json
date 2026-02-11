@@ -1,0 +1,52 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "title": "Run Advanced Hunting Query",
+    "description": "Runs KQL hunting queries via Defender XDR API"
+  },
+  "parameters": {
+    "PlaybookName": {
+      "type": "string",
+      "defaultValue": "Run-Hunting-Query"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Logic/workflows",
+      "apiVersion": "2019-05-01",
+      "name": "[parameters('PlaybookName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "definition": {
+          "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+          "triggers": {
+            "Recurrence": {
+              "type": "Recurrence",
+              "recurrence": {
+                "frequency": "Hour",
+                "interval": 1
+              }
+            }
+          },
+          "actions": {
+            "Run_Hunting_Query": {
+              "type": "Http",
+              "inputs": {
+                "method": "POST",
+                "uri": "https://api.security.microsoft.com/api/advancedqueries/run",
+                "headers": {
+                  "Authorization": "Bearer @{body('Get_Token')?['access_token']}",
+                  "Content-Type": "application/json"
+                },
+                "body": {
+                  "Query": "DeviceProcessEvents | where Timestamp > ago(1h) | where FileName == 'powershell.exe' | take 100"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
