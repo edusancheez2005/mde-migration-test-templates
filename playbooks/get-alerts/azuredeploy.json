@@ -1,0 +1,48 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "title": "Get MDE Alerts",
+    "description": "Fetches alerts from Microsoft Defender for Endpoint"
+  },
+  "parameters": {
+    "PlaybookName": {
+      "type": "string",
+      "defaultValue": "Get-MDE-Alerts"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Logic/workflows",
+      "apiVersion": "2019-05-01",
+      "name": "[parameters('PlaybookName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "definition": {
+          "actions": {
+            "Get_All_Alerts": {
+              "type": "Http",
+              "inputs": {
+                "method": "GET",
+                "uri": "https://api.securitycenter.microsoft.com/api/alerts?$top=100",
+                "headers": {
+                  "Authorization": "Bearer @{body('Get_Token')?['access_token']}"
+                }
+              }
+            },
+            "Get_Specific_Alert": {
+              "type": "Http",
+              "inputs": {
+                "method": "GET",
+                "uri": "https://api.securitycenter.microsoft.com/api/alerts/@{items('For_each')?['id']}",
+                "headers": {
+                  "Authorization": "Bearer @{body('Get_Token')?['access_token']}"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
