@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "resources": [
+    {
+      "type": "Microsoft.Web/connections",
+      "apiVersion": "2016-06-01",
+      "name": "MicrosoftDefenderATP",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "displayName": "Microsoft Defender ATP Connection",
+        "api": {
+          "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/shared_windowsdefenderatp')]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Web/connections",
+      "apiVersion": "2016-06-01",
+      "name": "wdatp-connection",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "displayName": "WDATP Legacy Connection",
+        "api": {
+          "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/MicrosoftDefenderATP')]"
+        }
+      }
+    }
+  ]
+}
