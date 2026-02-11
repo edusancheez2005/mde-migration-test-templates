@@ -1,0 +1,170 @@
+{
+  "title": "MDE/XDR to Graph Security API Migration Mapping",
+  "description": "Capability mapping for API migration - Feb 2027 deadline",
+  "lastUpdated": "2026-02-11",
+  "retirementDate": "2027-02-01",
+  "mappings": [
+    {
+      "capability": "List Alerts",
+      "legacy": {
+        "api": "api.securitycenter.microsoft.com",
+        "endpoint": "/api/alerts",
+        "method": "GET"
+      },
+      "new": {
+        "api": "graph.microsoft.com",
+        "endpoint": "/beta/security/alerts_v2",
+        "method": "GET"
+      },
+      "notes": "Use $filter for severity, status filtering"
+    },
+    {
+      "capability": "Get Alert by ID",
+      "legacy": {
+        "api": "api.securitycenter.microsoft.com",
+        "endpoint": "/api/alerts/{id}",
+        "method": "GET"
+      },
+      "new": {
+        "api": "graph.microsoft.com",
+        "endpoint": "/beta/security/alerts_v2/{id}",
+        "method": "GET"
+      },
+      "notes": "ID format may differ"
+    },
+    {
+      "capability": "List Incidents",
+      "legacy": {
+        "api": "api.security.microsoft.com",
+        "endpoint": "/api/incidents",
+        "method": "GET"
+      },
+      "new": {
+        "api": "graph.microsoft.com",
+        "endpoint": "/beta/security/incidents",
+        "method": "GET"
+      },
+      "notes": "Unified incident view"
+    },
+    {
+      "capability": "Add Incident Comment",
+      "legacy": {
+        "api": "api.security.microsoft.com",
+        "endpoint": "/api/incidents/{id}/comments",
+        "method": "POST"
+      },
+      "new": {
+        "api": "graph.microsoft.com",
+        "endpoint": "/beta/security/incidents/{id}/comments",
+        "method": "POST"
+      },
+      "notes": "Same payload structure"
+    },
+    {
+      "capability": "Advanced Hunting",
+      "legacy": {
+        "api": "api.security.microsoft.com",
+        "endpoint": "/api/advancedqueries/run",
+        "method": "POST"
+      },
+      "new": {
+        "api": "graph.microsoft.com",
+        "endpoint": "/beta/security/runHuntingQuery",
+        "method": "POST"
+      },
+      "notes": "KQL syntax unchanged"
+    },
+    {
+      "capability": "Isolate Machine",
+      "legacy": {
+        "api": "api.securitycenter.microsoft.com",
+        "endpoint": "/api/machines/{id}/isolate",
+        "method": "POST"
+      },
+      "new": {
+        "api": "graph.microsoft.com",
+        "endpoint": "/beta/security/securityActions",
+        "method": "POST"
+      },
+      "notes": "Use securityActions with name='isolate'"
+    },
+    {
+      "capability": "Unisolate Machine",
+      "legacy": {
+        "api": "api.securitycenter.microsoft.com",
+        "endpoint": "/api/machines/{id}/unisolate",
+        "method": "POST"
+      },
+      "new": {
+        "api": "graph.microsoft.com",
+        "endpoint": "/beta/security/securityActions",
+        "method": "POST"
+      },
+      "notes": "Use securityActions with name='unisolate'"
+    },
+    {
+      "capability": "Run AV Scan",
+      "legacy": {
+        "api": "api.securitycenter.microsoft.com",
+        "endpoint": "/api/machines/{id}/runAntiVirusScan",
+        "method": "POST"
+      },
+      "new": {
+        "api": "graph.microsoft.com",
+        "endpoint": "/beta/security/securityActions",
+        "method": "POST"
+      },
+      "notes": "Use securityActions with appropriate action name"
+    },
+    {
+      "capability": "Get Machine Info",
+      "legacy": {
+        "api": "api.securitycenter.microsoft.com",
+        "endpoint": "/api/machines/{id}",
+        "method": "GET"
+      },
+      "new": {
+        "api": "graph.microsoft.com",
+        "endpoint": "/beta/security/microsoft.graph.security.runHuntingQuery",
+        "method": "POST"
+      },
+      "notes": "Use DeviceInfo table in hunting query"
+    },
+    {
+      "capability": "Get Vulnerabilities",
+      "legacy": {
+        "api": "api.securitycenter.microsoft.com",
+        "endpoint": "/api/vulnerabilities",
+        "method": "GET"
+      },
+      "new": {
+        "api": "graph.microsoft.com",
+        "endpoint": "/beta/security/vulnerabilities",
+        "method": "GET"
+      },
+      "notes": "TVM data"
+    },
+    {
+      "capability": "Get Exposure Score",
+      "legacy": {
+        "api": "api.securitycenter.microsoft.com",
+        "endpoint": "/api/exposureScore",
+        "method": "GET"
+      },
+      "new": {
+        "api": "graph.microsoft.com",
+        "endpoint": "/beta/security/secureScores",
+        "method": "GET"
+      },
+      "notes": "Different response format"
+    }
+  ],
+  "connectorMigration": {
+    "legacy": [
+      "MicrosoftDefenderATP",
+      "shared_windowsdefenderatp"
+    ],
+    "new": "Microsoft Graph Security connector",
+    "notes": "Update Logic App connections to use Graph Security managed connector"
+  }
+}
