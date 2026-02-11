@@ -1,0 +1,49 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "title": "Get XDR Incidents",
+    "description": "Fetches incidents from Defender XDR and adds comments"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Logic/workflows",
+      "apiVersion": "2019-05-01",
+      "name": "Get-XDR-Incidents",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "definition": {
+          "actions": {
+            "List_Incidents": {
+              "type": "Http",
+              "inputs": {
+                "method": "GET",
+                "uri": "https://api.security.microsoft.com/api/incidents",
+                "headers": {
+                  "Authorization": "Bearer @{body('Get_Token')?['access_token']}"
+                }
+              }
+            },
+            "Add_Comment": {
+              "type": "Http",
+              "inputs": {
+                "method": "POST",
+                "uri": "https://api.security.microsoft.com/api/incidents/@{items('For_each')?['incidentId']}/comments",
+                "body": {
+                  "comment": "Processed by automation"
+                }
+              }
+            },
+            "Get_Evidence": {
+              "type": "Http",
+              "inputs": {
+                "method": "GET",
+                "uri": "https://api.security.microsoft.com/api/evidence"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
